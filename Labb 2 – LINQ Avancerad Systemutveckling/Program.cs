@@ -12,26 +12,6 @@ namespace Labb_2___LINQ_Avancerad_Systemutveckling
             using (LinqLabb2Context context = new LinqLabb2Context())
             {
 
-                var teachersAndStudents = context.Courses
-                     .Join(context.Teachers, c => c.Teacher.Id, t => t.Id, (c, t) => new { Course = c, Teacher = t });
-
-                var teachersAndStudents1 = context.Courses.Include(c => c.Students).Include(t => t.Subjects);
-
-                foreach (var item in teachersAndStudents1)
-                {
-                    Console.WriteLine(item.CourseName);
-                    foreach (var student in item.Students)
-                    {
-                        Console.WriteLine(student.Name);
-                    }
-                }
-
-
-
-                //foreach (var item in teachersAndStudents)
-                //{
-                //    Console.WriteLine(item.Teacher.Name + " ||||| " + item.Course.CourseName);
-                //}
 
 
 
@@ -39,12 +19,6 @@ namespace Labb_2___LINQ_Avancerad_Systemutveckling
 
 
             };
-
-
-
-
-
-
         }
 
         public void AddCourses()
@@ -80,17 +54,16 @@ namespace Labb_2___LINQ_Avancerad_Systemutveckling
             using LinqLabb2Context context = new LinqLabb2Context();
 
             //Här sparar vi ner course objekt = SUT21 = 8
-            var course = context.Courses.FirstOrDefault(c => c.Id == 8); //Använder DbSet.Courses för att hämta course med id 8
+            var course = context.Courses.FirstOrDefault(c => c.Id == 7); //Använder DbSet.Courses för att hämta course med id 8
 
             //Skapar en ny lista av Students i objektet 
             course.Students = new List<Student>()
             {
                 //Väljer vilka students som ska ha course objekt 8 SUT21
-                context.Students.FirstOrDefault(s => s.Id == 6),
-                context.Students.FirstOrDefault(s => s.Id == 7),
+                context.Students.FirstOrDefault(s => s.Id == 3),
+                context.Students.FirstOrDefault(s => s.Id == 4),
             };
 
-            //context.AddRange(course);
             context.SaveChanges();
         }
 
@@ -144,17 +117,28 @@ namespace Labb_2___LINQ_Avancerad_Systemutveckling
         {
             using (LinqLabb2Context context = new LinqLabb2Context())
             {
-                var teachersOfSubject1 = context.Teachers.Where(t => t.Subjects.Any(s => s.Id == 1));
+                var teachers = context.Courses
+                     .Join(context.Teachers, c => c.Teacher.Id, t => t.Id, (c, t) => new { Course = c, Teacher = t });
 
-                var studentsOfTeachers = context.Teachers.Where(t => t.Subjects.Any(s => s.Id == 1));
+                var teacherCourseStudent = context.Courses
+                      .Include(c => c.Teacher)
+                      .Include(c => c.Students)
+                      .SelectMany(c => c.Students
+                      .Select(s => new
+                      {
+                          StudentName = s.Name,
+                          TeacherName = c.Teacher.Name,
+                          Course = c.CourseName
+                      }));
 
+                foreach (var item in teacherCourseStudent)
+                {
+                    Console.WriteLine($"Student: {item.StudentName}, Teacher: {item.TeacherName} Course: {item.Course}");
 
-
+                };
 
             };
-
         }
-
 
     }
 }
