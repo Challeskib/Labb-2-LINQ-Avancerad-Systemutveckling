@@ -12,7 +12,7 @@ namespace Labb_2___LINQ_Avancerad_Systemutveckling
             using (LinqLabb2Context context = new LinqLabb2Context())
             {
 
-
+                
 
 
 
@@ -117,14 +117,12 @@ namespace Labb_2___LINQ_Avancerad_Systemutveckling
         {
             using (LinqLabb2Context context = new LinqLabb2Context())
             {
-                var teachers = context.Courses
-                     .Join(context.Teachers, c => c.Teacher.Id, t => t.Id, (c, t) => new { Course = c, Teacher = t });
-
                 var teacherCourseStudent = context.Courses
                       .Include(c => c.Teacher)
                       .Include(c => c.Students)
                       .SelectMany(c => c.Students
-                      .Select(s => new
+                      .Select
+                      (s => new
                       {
                           StudentName = s.Name,
                           TeacherName = c.Teacher.Name,
@@ -138,6 +136,24 @@ namespace Labb_2___LINQ_Avancerad_Systemutveckling
                 };
 
             };
+        }
+
+        public static void FindProgramming()
+        {
+            using (LinqLabb2Context context = new LinqLabb2Context())
+            {
+
+                bool subjectExists = context.Subjects.Any(s => s.SubjectName == "Programmering");
+
+                if (subjectExists)
+                {
+                    Console.WriteLine($"Programmering finns inlagt i ämnen");
+                }
+                else
+                {
+                    Console.WriteLine($"Programmering finns INTE inlagt i ämnen!!!!");
+                }
+            }
         }
 
     }
