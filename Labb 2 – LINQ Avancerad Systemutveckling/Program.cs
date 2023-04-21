@@ -26,7 +26,7 @@ namespace Labb_2___LINQ_Avancerad_Systemutveckling
             };
         }
 
-        public static void GetAllTeachersWithStudents()
+        public static void PrintAllTeachersWithStudents()
         {
             using (LinqLabb2Context context = new LinqLabb2Context())
             {
@@ -126,6 +126,9 @@ namespace Labb_2___LINQ_Avancerad_Systemutveckling
                 var Anas = context.Teachers.FirstOrDefault(t => t.Id == 4);
                 var Reidar = context.Teachers.FirstOrDefault(t => t.Id == 5);
 
+
+                PrintAllTeachersWithCourses();
+
                 if (course.Teacher == Anas)
                 {
                     course.Teacher = Reidar;
@@ -136,6 +139,38 @@ namespace Labb_2___LINQ_Avancerad_Systemutveckling
                 }
 
                 context.SaveChanges();
+
+                Console.WriteLine("Press key to view the changes: ");
+                Console.WriteLine("------------------------");
+                Console.ReadKey();
+                PrintAllTeachersWithCourses();
+
+            };
+        }
+
+        public static void PrintAllTeachersWithCourses()
+        {
+            using (LinqLabb2Context context = new LinqLabb2Context())
+            {
+                var teacherCourseStudent = context.Courses
+                      .Include(c => c.Teacher)
+                      .Include(c => c.Students)
+                      .SelectMany(c => c.Students
+                      .Select
+                      (s => new
+                      {
+                          StudentName = s.Name,
+                          TeacherName = c.Teacher.Name,
+                          Course = c.CourseName
+                      }));
+
+                Console.WriteLine();
+                Console.WriteLine("Student records with teachers:");
+                foreach (var item in teacherCourseStudent)
+                {
+                    Console.WriteLine($"Student: {item.StudentName}, Teacher: {item.TeacherName}");
+                };
+
             };
         }
     }

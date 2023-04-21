@@ -35,7 +35,7 @@ namespace Labb_2___LINQ_Avancerad_Systemutveckling.Controllers
                     break;
                 case 2:
                     Console.WriteLine("You chose to get all Students with Teachers.");
-                    Program.GetAllTeachersWithStudents();
+                    Program.PrintAllTeachersWithStudents();
                     ReturnToMenu();
                     break;
                 case 3:
