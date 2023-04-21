@@ -1,6 +1,8 @@
-﻿using Labb_2___LINQ_Avancerad_Systemutveckling.Data;
+﻿using Labb_2___LINQ_Avancerad_Systemutveckling.Controllers;
+using Labb_2___LINQ_Avancerad_Systemutveckling.Data;
 using Labb_2___LINQ_Avancerad_Systemutveckling.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure.Internal;
 
 namespace Labb_2___LINQ_Avancerad_Systemutveckling
 {
@@ -8,96 +10,7 @@ namespace Labb_2___LINQ_Avancerad_Systemutveckling
     {
         static void Main(string[] args)
         {
-
-            using (LinqLabb2Context context = new LinqLabb2Context())
-            {
-
-                
-
-
-
-
-
-            };
-        }
-
-        public void AddCourses()
-        {
-            using LinqLabb2Context context = new LinqLabb2Context();
-
-            Course course = new Course() { CourseName = "SUT21", Teacher = context.Teachers.FirstOrDefault(t => t.Id == 1) };
-            context.Add(course);
-        }
-
-        public void AddStudents()
-        {
-            using LinqLabb2Context context = new LinqLabb2Context();
-
-
-            List<Student> students = new List<Student>
-            {
-                new Student () { Name = "Charlie"},
-                new Student () { Name = "Daniel"},
-                new Student () { Name = "Peter"},
-                new Student () { Name = "Elvin"},
-                new Student () { Name = "Irma"},
-                new Student () { Name = "Ursula"},
-                new Student () { Name = "Damir"}
-            };
-
-            context.Students.AddRange(students);
-            context.SaveChanges();
-        }
-
-        public void UpdateCourseStudent()
-        {
-            using LinqLabb2Context context = new LinqLabb2Context();
-
-            //Här sparar vi ner course objekt = SUT21 = 8
-            var course = context.Courses.FirstOrDefault(c => c.Id == 7); //Använder DbSet.Courses för att hämta course med id 8
-
-            //Skapar en ny lista av Students i objektet 
-            course.Students = new List<Student>()
-            {
-                //Väljer vilka students som ska ha course objekt 8 SUT21
-                context.Students.FirstOrDefault(s => s.Id == 3),
-                context.Students.FirstOrDefault(s => s.Id == 4),
-            };
-
-            context.SaveChanges();
-        }
-
-        public void AddCourseSubject()
-        {
-            using LinqLabb2Context context = new LinqLabb2Context();
-
-            var selectCourse = context.Courses.FirstOrDefault(c => c.Id == 7); //Ska hämta courseCollectionOfSubjects
-            var id = context.Subjects.FirstOrDefault(cs => cs.Id == 2); //Välj vilka ämnen
-            var id1 = context.Subjects.FirstOrDefault(cs => cs.Id == 3);//Välj vilka ämnen
-
-            selectCourse.Subjects = new List<Subject>()
-            {
-                id,
-                id1,
-            };
-            context.SaveChanges();
-        }
-
-        public void AddSubjectTeacher()
-        {
-            using LinqLabb2Context context = new LinqLabb2Context();
-
-            var selectSubject = context.Subjects.FirstOrDefault(s => s.Id == 3); //Hämta vilket subject
-            var id = context.Teachers.FirstOrDefault(t => t.Id == 6); //Välj vilka lärare
-            var id1 = context.Teachers.FirstOrDefault(t => t.Id == 7);//Välj vilka lärare
-
-            selectSubject.Teachers = new List<Teacher>()
-            {
-                id,
-                id1,
-
-            };
-            context.SaveChanges();
+            Utility.Menu();
         }
         public static void GetAllMathTeachers()
         {
@@ -131,8 +44,7 @@ namespace Labb_2___LINQ_Avancerad_Systemutveckling
 
                 foreach (var item in teacherCourseStudent)
                 {
-                    Console.WriteLine($"Student: {item.StudentName}, Teacher: {item.TeacherName} Course: {item.Course}");
-
+                    Console.WriteLine($"Student: {item.StudentName}, Teacher: {item.TeacherName}");
                 };
 
             };
@@ -147,14 +59,84 @@ namespace Labb_2___LINQ_Avancerad_Systemutveckling
 
                 if (subjectExists)
                 {
-                    Console.WriteLine($"Programmering finns inlagt i ämnen");
+                    Console.WriteLine($"Programmering Exists");
                 }
                 else
                 {
-                    Console.WriteLine($"Programmering finns INTE inlagt i ämnen!!!!");
+                    Console.WriteLine($"Programmering does NOT exist!!!");
                 }
             }
         }
 
+        public static void EditSubjectToOop()
+        {
+            using (LinqLabb2Context context = new LinqLabb2Context())
+            {
+                var subjectToUpdate = context.Subjects
+                    .FirstOrDefault(s => s.SubjectName == "Programmering2" || s.SubjectName == "OOP");
+
+                Console.WriteLine("List of all Subjects");
+                foreach (var item in context.Subjects)
+                {
+                    Console.WriteLine("Subject: " + item.SubjectName);
+                }
+
+                Console.WriteLine("Press key to continue");
+                Console.ReadKey();
+
+                if (subjectToUpdate.SubjectName == "Programmering2")
+                {
+                    subjectToUpdate.SubjectName = "OOP"; // update the name
+                    context.SaveChanges(); // save changes to the database
+                    Console.WriteLine();
+                    Console.WriteLine($"Subject name updated to {subjectToUpdate.SubjectName}.");
+                }
+                else if (subjectToUpdate.SubjectName == "OOP")
+                {
+                    subjectToUpdate.SubjectName = "Programmering2"; // update the name
+                    context.SaveChanges(); // save changes to the database
+                    Console.WriteLine();
+                    Console.WriteLine($"Subject name updated to {subjectToUpdate.SubjectName}.");
+                }
+                else
+                {
+                    Console.WriteLine("Did not work");
+                }
+               
+                Console.WriteLine("Press key to view the changes: ");
+                Console.WriteLine("------------------------");
+                Console.WriteLine();
+
+                Console.ReadKey();
+
+                Console.WriteLine("List of all Subjects");
+                foreach (var item in context.Subjects)
+                {
+                    Console.WriteLine("Subject: " + item.SubjectName);
+                }
+            };
+        }
+
+        public static void UpdateTeacherToReidarOrAnas()
+        {
+            using (LinqLabb2Context context = new LinqLabb2Context())
+            {
+                var course = context.Courses.FirstOrDefault(c => c.Id == 8);
+
+                var Anas = context.Teachers.FirstOrDefault(t => t.Id == 4);
+                var Reidar = context.Teachers.FirstOrDefault(t => t.Id == 5);
+
+                if (course.Teacher == Anas)
+                {
+                    course.Teacher = Reidar;
+                }
+                else if (course.Teacher == Reidar)
+                {
+                    course.Teacher = Anas;
+                }
+
+                context.SaveChanges();
+            };
+        }
     }
 }
